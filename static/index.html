@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>父页面</title>
+</head>
+<body>
+<h1>父页面</h1>
+<button id="sendMessage">向 iframe 发送参数</button>
+
+<!-- iframe -->
+<iframe id="myIframe" src="inside.html" width="0" height="0"></iframe>
+
+<script>
+    var iframe = document.getElementById('myIframe');
+
+    // 监听来自 iframe 的消息
+    window.addEventListener('message', function(event) {
+        // 验证来源
+        if (event.origin !== window.location.origin) {
+            console.warn('收到不可信来源的消息');
+            return;
+        }
+
+        // 处理日志消息
+        var data = event.data;
+        if (data.log) {
+            // console.log('来自 iframe 的日志:', data);
+        }
+    });
+
+    // 点击按钮时向 iframe 发送参数
+    document.getElementById('sendMessage').addEventListener('click', function() {
+        var message = {
+            type: 'wasm',
+            codeName: 'test.spx',
+            code: `
+            onStart => {
+  flag := true
+  for flag {
+    onMsg "die", => {
+      flag = false
+    }
+    glide -877, 180, 3
+    setXYpos -240, 180
+  }
+}
+            `
+        };
+
+        // 发送消息到 iframe
+        iframe.contentWindow.postMessage(message, window.location.origin);
+    });
+</script>
+</body>
+</html>
